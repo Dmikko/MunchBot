@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "express": "^4.21.1",
+    "openai": "^4.72.0",
+    "puppeteer": "^23.8.0"
+  }
+}

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opskriftsgenerator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .form-container label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        .form-container .checkbox-group {
+            margin-bottom: 20px;
+        }
+        .checkbox-group label {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        input[type="submit"], button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        input[type="submit"]:hover, button:hover {
+            background-color: #45a049;
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        #results, #mealPlan {
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        .recipe, .meal-plan-day {
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fff;
+            overflow: hidden;
+        }
+        .recipe-title {
+            width: 100%;
+            text-align: left;
+            font-size: 16px;
+            padding: 10px;
+            background-color: #FF5733;
+            border: none;
+            cursor: pointer;
+        }
+        .recipe-title:hover {
+            background-color: #e0e0e0;
+        }
+        .recipe-details {
+            padding: 10px;
+            display: none;
+        }
+        .export-button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .export-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h1>Opskriftsgenerator</h1>
+    <form id="recipeForm">
+        <label>Vælg måltidstype:</label>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="mealType" value="Morgenmad"> Morgenmad</label>
+            <label><input type="checkbox" name="mealType" value="Frokost"> Frokost</label>
+            <label><input type="checkbox" name="mealType" value="Aftensmad"> Aftensmad</label>
+            <label><input type="checkbox" name="mealType" value="Snacks"> Snacks</label>
+        </div>
+
+        <label>Overordnet ingrediens:</label>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="ingredient" value="Kylling"> Kylling</label>
+            <label><input type="checkbox" name="ingredient" value="Oksekød"> Oksekød</label>
+            <label><input type="checkbox" name="ingredient" value="Gris"> Gris</label>
+            <label><input type="checkbox" name="ingredient" value="Grøntsager"> Grøntsager</label>
+            <label><input type="checkbox" name="ingredient" value="Vegetar"> Vegetar</label>
+            <label><input type="checkbox" name="ingredient" value="Fisk"> Fisk</label>
+            <label><input type="checkbox" name="ingredient" value="Andet"> Andet</label>
+        </div>
+
+        <label>Hvor lang tid det tager at lave:</label>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="time" value="15"> Op til 15 minutter</label>
+            <label><input type="checkbox" name="time" value="30"> Op til 30 minutter</label>
+            <label><input type="checkbox" name="time" value="60"> Op til 60 minutter</label>
+            <label><input type="checkbox" name="time" value="slowcook"> Slowcook</label>
+        </div>
+
+        <label>Tema:</label>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="theme" value="Sundt"> Sundt</label>
+            <label><input type="checkbox" name="theme" value="Weekendmad"> Weekendmad</label>
+            <label><input type="checkbox" name="theme" value="Kulturretter"> Lands- og kulturbaserede retter</label>
+            <label><input type="checkbox" name="theme" value="Hverdag"> Hverdag</label>
+        </div>
+
+        <label>Stemning:</label>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="mood" value="festmad"> Festmad</label>
+            <label><input type="checkbox" name="mood" value="comfort food"> Comfort Food</label>
+            <label><input type="checkbox" name="mood" value="hurtige snacks"> Hurtige Snacks</label>
+        </div>
+
+        <label>Hvor mange personer:</label>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="people" value="1"> 1</label>
+            <label><input type="checkbox" name="people" value="2"> 2</label>
+            <label><input type="checkbox" name="people" value="3"> 3</label>
+            <label><input type="checkbox" name="people" value="4"> 4</label>
+            <label><input type="checkbox" name="people" value="5"> 5</label>
+        </div>
+
+        <label>Er du pirat?</label>
+        <div class="checkbox-group">
+            <label><input type="checkbox" id="pirateMode" name="pirateMode" value="true"> Ja!</label>
+        </div>
+
+        <label>Vælg sprog:</label>
+        <select id="language">
+            <option value="dansk">Dansk</option>
+            <option value="engelsk">Engelsk</option>
+        </select>
+
+        <input type="submit" value="Generer Opskrifter">
+        <button type="button" onclick="generateMealPlan()">Generer Madplan(W.I.P)</button>
+
+    </form>
+
+    <div id="loading">
+        <p>Henter opskrifter...</p>
+        <img src="assets/Bean Eater@1x-1.0s-200px-200px.gif" alt="loadingAnimation" height="204" width="204">
+
+    </div>
+</div>
+
+<div id="results"></div>
+<div id="mealPlan"></div>
+
+<p>Point: <span id="points">0</span></p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script type="module" src="main.js"></script>
+</body>
+</html>
